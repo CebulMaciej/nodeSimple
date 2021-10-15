@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
 const bodyParser = require('body-parser')
 const expressJSDocSwagger = require('express-jsdoc-swagger');
 
@@ -38,7 +39,9 @@ const PORT = 8091;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
-
+app.use(cors({
+    origin: '*'
+}));
 function generateAccessToken(username) {
     return jwt.sign({username: username}, "superExpressKey", { expiresIn: '1800s' });
 }
