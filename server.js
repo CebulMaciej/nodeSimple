@@ -42,6 +42,46 @@ app.use(express.json());
 function generateAccessToken(username) {
     return jwt.sign({username: username}, "superExpressKey", { expiresIn: '1800s' });
 }
+
+
+
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+
+    if (token == null) return res.sendStatus(401)
+
+    jwt.verify(token, "superExpressKey", (err, user) => {
+        console.log(err)
+
+        if (err) return res.sendStatus(403)
+
+        req.user = user
+
+        next()
+    })
+}
+
+/**
+ * GET /api/healthCheck
+ * @summary This is the summary of the endpoint
+ * @tags User
+ * @return {object} 200 - success response - application/json
+ * @return {object} 400 - Bad request response
+ */
+app.get('/api/me',authenticateToken, async (req, res) => {
+
+    try
+    {
+        res.json({username: "admin"})
+    }
+    catch(ex){
+        res.statusCode = 500;
+        res.json(ex)
+    }
+});
+
+
 /**
  * GET /api/me
  * @summary This is the summary of the endpoint
@@ -53,6 +93,8 @@ app.get('/api/me', async (req, res) => {
 
     try
     {
+
+
         res.json({username: "admin"})
     }
     catch(ex){
